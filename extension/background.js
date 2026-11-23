@@ -7,7 +7,7 @@ const SITES = {
   x: { url: "https://x.com/compose/post/unsent/scheduled", key: "xq" },
   li: { url: "https://www.linkedin.com/share/management/", key: "liq" },
 };
-const syncTabs = new Map(); // tabId -> {resolve, timer, site}
+const syncTabs = new Map(); // tabId -> {resolve, timer, site, backTo}
 const inflight = {};
 
 // hidden: read in a background tab, where the site may show times in another timezone
@@ -36,18 +36,25 @@ async function saveScheduled(site, rawTimes, hidden) {
   return next;
 }
 
-function sync(site) {
+// The first read for a site happens in a visible tab: a hidden tab can show times in
+// another timezone, and the shift can only be learned once there's a trusted (visible) read.
+function sync(site, fromTabId) {
   if (inflight[site]) return inflight[site];
   inflight[site] = new Promise(async (resolve) => {
     let tab;
     try {
-      tab = await chrome.tabs.create({ url: SITES[site].url, active: false, pinned: false });
+      const key = SITES[site].key;
+      const { [key]: cur = {} } = await chrome.storage.local.get(key);
+      const visible = !cur.trusted?.length;
+      tab = await chrome.tabs.create({
+        url: SITES[site].url, active: visible, pinned: false,
+        ...(fromTabId ? { openerTabId: fromTabId } : {}),
+      });
+      const timer = setTimeout(() => finish(tab.id, { ok: false, error: "timeout" }), 60000);
+      syncTabs.set(tab.id, { resolve, timer, site, backTo: visible ? fromTabId : null });
     } catch (e) {
       resolve({ ok: false, error: String(e) });
-      return;
     }
-    const timer = setTimeout(() => finish(tab.id, { ok: false, error: "timeout" }), 60000);
-    syncTabs.set(tab.id, { resolve, timer, site });
   }).finally(() => (inflight[site] = null));
   return inflight[site];
 }
@@ -57,6 +64,7 @@ function finish(tabId, result) {
   if (!entry) return;
   clearTimeout(entry.timer);
   syncTabs.delete(tabId);
+  if (entry.backTo) chrome.tabs.update(entry.backTo, { active: true }).catch(() => {});
   chrome.tabs.remove(tabId).catch(() => {});
   entry.resolve(result);
 }
@@ -80,7 +88,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         if (sender.tab) finish(sender.tab.id, { ok: false, error: msg.error });
         return { ok: true };
       case "sync":
-        return await sync(site);
+        return await sync(site, sender.tab?.id);
       case "queued": {
         const { [key]: cur = {} } = await chrome.storage.local.get(key);
         const scheduled = [...new Set([...(cur.scheduled || []), msg.t])].sort((a, b) => a - b);

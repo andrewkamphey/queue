@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Queue for X and LinkedIn",
   "short_name": "Queue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "One click puts your post at the end of your queue on X and LinkedIn, using each site's own scheduler.",
   "minimum_chrome_version": "116",
   "permissions": [

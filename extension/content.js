@@ -307,7 +307,7 @@
       }
       // A read in the wrong timezone shows up as posts "in the past". Don't queue on that.
       if ((state.scheduled || []).some((p) => p < (state.syncedAt || 0) - 15 * 60 * 1000))
-        throw new Error("the queue times look off. Open your Scheduled page once, then try again");
+        throw new Error("the queue times look off. Click ↻ Re-read X queue in the ▾ menu, then try again");
       let t = pickedT;
       if (t && S.clashes(upcoming(), t)) {
         throw new Error("that slot is now within an hour of another post — pick another");
