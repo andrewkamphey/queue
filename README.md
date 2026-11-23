@@ -23,11 +23,16 @@ Settings are saved in `chrome.storage.local` under `xq_cfg`.
 
 ## Install
 
-From the Chrome Web Store, or unpacked:
+Download from **https://kamphey.com/q** (not in the Chrome Web Store yet):
 
-1. Open `chrome://extensions` and turn on **Developer mode**.
-2. Click **Load unpacked** and choose the `extension` folder.
-3. Reload any open x.com or linkedin.com tabs.
+1. Download the ZIP and double-click it. You get a folder called `queue-extension`. Keep it somewhere it won't get deleted.
+2. Open `chrome://extensions` and turn on **Developer mode** (top right).
+3. Click **Load unpacked** and choose the `queue-extension` folder.
+4. Reload any open x.com or linkedin.com tabs.
+
+Or clone this repo and load the `extension` folder the same way.
+
+To update: download again, replace the folder, and click the reload arrow on Queue's card in `chrome://extensions`.
 
 ## Files
 
@@ -36,7 +41,7 @@ From the Chrome Web Store, or unpacked:
 - `extension/li.js`: LinkedIn. Reads the list from the composer's "Scheduled" tab, drives LinkedIn's picker.
 - `extension/background.js`: reads X's scheduled page in a background tab and caches the list.
 - `test/slots.test.js`: `node test/slots.test.js`
-- `store/`: Chrome Web Store assets, privacy policy, and `fit-screens.sh` to fit screenshots to 1280×800.
+- `store/`: Chrome Web Store assets, privacy policy, `fit-screens.sh` (fits screenshots to 1280×800), and `build-download.sh` (builds the kamphey.com/q ZIP; then deploy kamphey.com).
 
 ## Fragile bits (checked November 2026)
 
