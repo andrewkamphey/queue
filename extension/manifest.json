@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Queue for X and LinkedIn",
+  "short_name": "Queue",
+  "version": "1.0.0",
+  "description": "One click puts your post at the end of your queue on X and LinkedIn, using each site's own scheduler.",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://www.linkedin.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*"
+      ],
+      "js": [
+        "slots.js",
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.linkedin.com/*"
+      ],
+      "js": [
+        "slots.js",
+        "li.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Queue for X and LinkedIn"
+  }
+}
